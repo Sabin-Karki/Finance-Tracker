@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/finance_tracker
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: pass
+    volumes:
+      - ./Backend/src:/app/src  # only mount the src directory for code changes
+      - backend_build:/app/target  # persist build files
+
+  frontend:
+    build: ./Frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./Frontend/src:/app/src  # mount src for React hot-reloading
+      - ./Frontend/public:/app/public  # mount public folder if you have one
+      - /app/node_modules  # preserve container node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: finance_tracker
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  backend_build:
