@@ -58,12 +58,27 @@ const BudgetPage = () => {
   };
 
   const handleUpdate = async (id) => {
+     // find the original budget entry 
+    const originalBudget = budgetData.find((budget)=>budget.id === id);
+     //check if the edit data is different from the original data
+     const isDataChanged = 
+     editData.name !== originalBudget.name ||
+     editData.amount!== originalBudget.amount ||
+     editData.category !== originalBudget.category||
+     editData.spent !== originalBudget.spent;
+
+     if (!isDataChanged){
+      alert('No changes has been made !');
+      return;
+     }
     try {
       await updateBudget(id, editData);
       await fetchBudgetData();
       setEditingId(null);
+      alert("Budget updated successfully");
     } catch (error) {
       console.error('Error updating budget:', error);
+      alert("Failed to update. Try again ! ");
     }
   };
 
