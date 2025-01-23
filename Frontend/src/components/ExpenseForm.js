@@ -10,6 +10,7 @@ const ExpenseForm=({onSubmit})=>{
         description:''
     });
 
+    const validResult = /^[A-Za-z\s]+$/;
     const [errorMessage , setErrorMessage] = useState('');
     const handleChange=(e)=>{
         const {name,value}=e.target;
@@ -20,9 +21,13 @@ const ExpenseForm=({onSubmit})=>{
         setErrorMessage (''); // clear error Message when user starts typing
     }   
     
-    const validateForm = () => {
+      const validateForm = () => {
       if (!formData.title.trim()){
         setErrorMessage('Title is required');
+        return false;
+      }
+      if (!formData.title.match(validResult)){
+        setErrorMessage('Title should contain only letters and spaces');
         return false;
       }
       if (!formData.amount){
@@ -37,9 +42,16 @@ const ExpenseForm=({onSubmit})=>{
         setErrorMessage('Category is required');
         return false;
       }
+      if(!formData.category.match(validResult)){
+        setErrorMessage('Category should contain only letters and spaces');
+        return false;
+      }
       if(!formData.description.trim()){
         setErrorMessage('Description is required');
         return false;
+      }
+      if(!formData.description.match(validResult)){
+        setErrorMessage('Description should contain only letters and spaces');
       }
       return true;
     }
