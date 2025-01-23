@@ -8,6 +8,7 @@ const BudgetForm = ({ onSubmit }) => {
     spent: ''
   });
 
+  const validInput = /^[A-Za-z\s]+$/;
   const [errorMessage , setErrorMessage] = useState('');
 
   const handleChange = (e) => {
@@ -24,12 +25,20 @@ const BudgetForm = ({ onSubmit }) => {
       setErrorMessage('Name is required');
       return false; 
     }
+    if(!formData.name.match(validInput)){
+      setErrorMessage('Name should contain only alphabets');
+      return false;
+    }
     if(!formData.amount){
       setErrorMessage('Amount is required');
       return false;
     } 
     if(!formData.category.trim()){
       setErrorMessage('Category is required');
+      return false;
+    }
+     if(!formData.category.match(validInput)){
+      setErrorMessage('Category should contain only alphabets');
       return false;
     }
     if(!formData.spent){
