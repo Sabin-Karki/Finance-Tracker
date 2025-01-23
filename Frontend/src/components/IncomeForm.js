@@ -10,7 +10,8 @@ const IncomeForm = ({ onSubmit }) => {
   });
 
   const [errorMessage, setErrorMessage] = useState(''); // State for error message
-
+  const validInput = /^[A-Za-z\s]+$/;
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -21,30 +22,54 @@ const IncomeForm = ({ onSubmit }) => {
     setErrorMessage('');
   };
 
-  const validateForm = () => {
-    if (!formData.title.trim()) {
-      setErrorMessage('Title is required');
-      return false;
-    }
-    if (!formData.amount) {
-      setErrorMessage('Amount is required');
-      return false;
-    }
-    if (!formData.date) {
-      setErrorMessage('Date is required');
-      return false;
-    }
-    if (!formData.category.trim()) {
-      setErrorMessage('Category is required');
-      return false;
-    }
-    if (!formData.description.trim()) {
-      setErrorMessage('Description is required');
-      return false;
-    }
-    return true; // Form is valid
-  };
+ const validateForm = () => {
+  // Check if title is empty
+  if (!formData.title.trim()) {
+    setErrorMessage('Title is required');
+    return false;
+  }
+  // Check if title contains invalid characters
+  if (!formData.title.match(validInput)) {
+    setErrorMessage('Title should contain only letters and spaces');
+    return false;
+  }
 
+  // Check if amount is empty
+  if (!formData.amount) {
+    setErrorMessage('Amount is required');
+    return false;
+  }
+
+  // Check if date is empty
+  if (!formData.date) {
+    setErrorMessage('Date is required');
+    return false;
+  }
+
+  // Check if category is empty
+  if (!formData.category.trim()) {
+    setErrorMessage('Category is required');
+    return false;
+  }
+  // Check if category contains invalid characters
+  if (!formData.category.match(validInput)) {
+    setErrorMessage('Category should contain only letters and spaces');
+    return false;
+  }
+
+  // Check if description is empty
+  if (!formData.description.trim()) {
+    setErrorMessage('Description is required');
+    return false;
+  }
+  // Check if description contains invalid characters
+  if (!formData.description.match(validInput)) {
+    setErrorMessage('Description should contain only letters and spaces');
+    return false;
+  }
+
+  return true; // Form is valid
+};
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
