@@ -9,6 +9,9 @@ const ExpensePage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
 
+  const [editErrors, setEditErrors] = useState({});
+  const validInput= /^[A-Za-z\s]+$/;
+
   useEffect(() => {
     fetchExpenseData();
   }, []);
@@ -51,7 +54,42 @@ const ExpensePage = () => {
     }));
   };
 
+  const validateForm = () => {
+     const errors = {};
+
+  if (!editData.title.trim()) {
+    errors.title = 'Title is required';
+  }
+  if (!editData.amount) {
+    errors.amount = 'Amount is required';
+  }
+  if (!editData.date) {
+    errors.date = 'Date is required';
+  }
+  if (!editData.category.trim()) {
+    errors.category = 'Category is required';
+  }
+  if (!editData.description.trim()) {
+    errors.description = 'Description is required';
+  }
+  if (!editData.title.match(validInput)) {
+    errors.title = 'Title should contain only letters and spaces';
+  }
+  if (!editData.category.match(validInput)) {
+    errors.category = 'Category should contain only letters and spaces';
+  }
+  if(!editData.description.match(validInput)){
+    errors.description = 'Description should contain only letters and spaces';
+  }
+
+  setEditErrors(errors);
+  return Object.keys(errors).length === 0;
+};
+  
 const handleUpdate = async (id) => {
+  if (!validateForm()){
+    return;
+  }
   // Find the original expense entry
   const originalExpense = expenseData.find((expense) => expense.id === id);
 
@@ -91,60 +129,75 @@ const handleUpdate = async (id) => {
   };
 
   const renderExpenseItem = (expense) => {
-    if (editingId === expense.id) {
-      return (
-        <div key={expense.id} className="p-4 bg-white rounded-md shadow-md space-y-3">
-          <div className="flex gap-2">
-            <input
-              name="title"
-              value={editData.title}
-              onChange={handleChange}
-              className="flex-1 p-1 border rounded"
-              placeholder="Title"
-            />
-            <input
-              name="amount"
-              type="number"
-              value={editData.amount}
-              onChange={handleChange}
-              className="w-24 p-1 border rounded"
-              placeholder="Amount"
-            />
-          </div>
-          <div className="flex gap-2">
-            <input
-              name="date"
-              type="date"
-              value={editData.date}
-              onChange={handleChange}
-              className="p-1 border rounded"
-            />
-            <input
-              name="category"
-              value={editData.category}
-              onChange={handleChange}
-              className="flex-1 p-1 border rounded"
-              placeholder="Category"
-            />
-          </div>
-          <textarea
-            name="description"
-            value={editData.description}
-            onChange={handleChange}
-            className="w-full p-1 border rounded"
-            placeholder="Description"
-          />
-          <div className="flex justify-end gap-2">
-            <button onClick={() => setEditingId(null)} className="p-1 text-gray-600 hover:text-gray-800">
-              <X size={16} />
-            </button>
-            <button onClick={() => handleUpdate(expense.id)} className="p-1 text-green-600 hover:text-green-800">
-              <Check size={16} />
-            </button>
-          </div>
-        </div>
-      );
-    }
+   if (editingId === expense.id) {
+  return (
+    <div key={expense.id} className="p-4 bg-white rounded-md shadow-md space-y-3">
+      <div className="flex gap-2">
+        <input
+          name="title"
+          value={editData.title}
+          onChange={handleChange}
+          className={`flex-1 p-1 border rounded ${
+            editErrors.title ? 'border-red-500' : ''
+          }`}
+          placeholder="Title"
+        />
+        <input
+          name="amount"
+          type="number"
+          value={editData.amount}
+          onChange={handleChange}
+          className={`w-24 p-1 border rounded ${
+            editErrors.amount ? 'border-red-500' : ''
+          }`}
+          placeholder="Amount"
+        />
+      </div>
+      {editErrors.title && <p className="text-red-500 text-sm">{editErrors.title}</p>}
+      {editErrors.amount && <p className="text-red-500 text-sm">{editErrors.amount}</p>}
+
+      <div className="flex gap-2">
+        <input
+          name="date"
+          type="date"
+          value={editData.date}
+          onChange={handleChange}
+          className={`p-1 border rounded ${
+            editErrors.date ? 'border-red-500' : ''
+          }`}
+        />
+        <input
+          name="category"
+          value={editData.category}
+          onChange={handleChange}
+          className={`flex-1 p-1 border rounded ${
+            editErrors.category ? 'border-red-500' : ''
+          }`}
+          placeholder="Category"
+        />
+      </div>
+      {editErrors.date && <p className="text-red-500 text-sm">{editErrors.date}</p>}
+      {editErrors.category && <p className="text-red-500 text-sm">{editErrors.category}</p>}
+
+      <textarea
+        name="description"
+        value={editData.description}
+        onChange={handleChange}
+        className="w-full p-1 border rounded"
+        placeholder="Description"
+      />
+      {editErrors.description && <p className="text-red-500 text-sm">{editErrors.description}</p>}
+      <div className="flex justify-end gap-2">
+        <button onClick={() => setEditingId(null)} className="p-1 text-gray-600 hover:text-gray-800">
+          <X size={16} />
+        </button>
+        <button onClick={() => handleUpdate(expense.id)} className="p-1 text-green-600 hover:text-green-800">
+          <Check size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
     return (
       <div key={expense.id} className="p-4 bg-white rounded-md shadow-md">
