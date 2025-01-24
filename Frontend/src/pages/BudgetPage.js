@@ -9,6 +9,9 @@ const BudgetPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
 
+  const [editErrors,setEditErrors] = useState({});
+  const validInput = /^[A-Za-z\s]+$/;
+
   useEffect(() => {
     fetchBudgetData();
   }, []);
@@ -56,9 +59,36 @@ const BudgetPage = () => {
       [name]: value,
     }));
   };
+  
+  const validateForm = () => {
+    const errors = {};
+    if (!editData.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    if (!editData.name.match(validInput)) {
+      errors.name = 'Name should contain only alphabets';
+    }
+    if (!editData.amount) {
+      errors.amount = 'Amount is required';
+    }
+    if (!editData.category.trim()) {
+      errors.category = 'Category is required';
+    }
+    if (!editData.category.match(validInput)) {
+      errors.category = 'Category should contain only alphabets';
+    }
+    if (!editData.spent) {
+      errors.spent = 'Spent amount is not filled !';
+    }
+    setEditErrors(errors);
+    return Object.keys(errors).length ===0;
+  };
 
   const handleUpdate = async (id) => {
-     // find the original budget entry 
+    if(!validateForm()){
+      return;
+    }
+    // find the original budget entry 
     const originalBudget = budgetData.find((budget)=>budget.id === id);
      //check if the edit data is different from the original data
      const isDataChanged = 
@@ -75,10 +105,10 @@ const BudgetPage = () => {
       await updateBudget(id, editData);
       await fetchBudgetData();
       setEditingId(null);
-      alert("Budget updated successfully");
+      alert ( "Budget updated successfully");
     } catch (error) {
       console.error('Error updating budget:', error);
-      alert("Failed to update. Try again ! ");
+      alert("Failed to update. Try again !");
     }
   };
 
@@ -98,39 +128,55 @@ const BudgetPage = () => {
 
     if (editingId === budget.id) {
       return (
-        <div key={budget.id} className="p-4 bg-white rounded-md shadow-md space-y-3">
-          <div className="flex gap-2">
-            <input
-              name="name"
-              value={editData.name}
-              onChange={handleChange}
-              className="flex-1 p-1 border rounded"
-              placeholder="Name"
-            />
-            <input
-              name="amount"
-              type="number"
-              value={editData.amount}
-              onChange={handleChange}
-              className="w-24 p-1 border rounded"
-              placeholder="Amount"
-            />
-          </div>
-          <input
-            name="category"
-            value={editData.category}
-            onChange={handleChange}
-            className="flex-1 p-1 border rounded"
-            placeholder="Category"
-          />
-          <input
-            name="spent"
-            type="number"
-            value={editData.spent}
-            onChange={handleChange}
-            className="w-24 p-1 border rounded"
-            placeholder="Spent"
-          />
+       <div key={budget.id} className="p-4 bg-white rounded-md shadow-md space-y-3">
+  <div className="flex gap-2">
+    <input
+      name="name"
+      value={editData.name}
+      onChange={handleChange}
+      className={`flex-1 p-1 border rounded ${
+        editErrors.name ? 'border-red-500' : ''
+      }`}
+      placeholder="Name"
+    />
+    <input
+      name="amount"
+      type="number"
+      value={editData.amount}
+      onChange={handleChange}
+      className={`w-24 p-1 border rounded ${
+        editErrors.amount ? 'border-red-500' : ''
+      }`}
+      placeholder="Amount"
+    />
+  </div>
+  {/* ADD ERROR MESSAGES */}
+  {editErrors.name && <p className="text-red-500 text-sm">{editErrors.name}</p>}
+  {editErrors.amount && <p className="text-red-500 text-sm">{editErrors.amount}</p>}
+
+  <input
+    name="category"
+    value={editData.category}
+    onChange={handleChange}
+    className={`flex-1 p-1 border rounded ${
+      editErrors.category ? 'border-red-500' : ''
+    }`}
+    placeholder="Category"
+  />
+  {editErrors.category && <p className="text-red-500 text-sm">{editErrors.category}</p>}
+
+  <input
+    name="spent"
+    type="number"
+    value={editData.spent}
+    onChange={handleChange}
+    className={`w-24 p-1 border rounded ${
+      editErrors.spent ? 'border-red-500' : ''
+    }`}
+    placeholder="Spent"
+  />
+  {editErrors.spent && <p className="text-red-500 text-sm">{editErrors.spent}</p>}
+  
           <div className="flex justify-end gap-2">
             <button onClick={() => setEditingId(null)} className="p-1 text-gray-600 hover:text-gray-800">
               <X size={16} />
@@ -142,7 +188,6 @@ const BudgetPage = () => {
         </div>
       );
     }
-
     return (
       <div key={budget.id} className="p-4 bg-white rounded-md shadow-md">
         <div className="flex justify-between items-start">
