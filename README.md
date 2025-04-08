@@ -38,12 +38,23 @@ A personal finance tracker built with **Spring Boot**, **React**, **Tailwind CSS
 - Axios
 - React Router
 
----
+
+#FOLDER STRUCTURE
+finance-tracker/
+├── backend/
+│   ├── src/
+│   ├── Dockerfile
+│   └── ...
+├── frontend/
+│   ├── src/
+│   ├── Dockerfile
+│   └── ...
+├── docker-compose.yml
+
 
 ## 📦 Setup Instructions
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/Sabin-Karki/finance-tracker.git
 cd finance-tracker
